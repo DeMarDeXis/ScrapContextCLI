@@ -1,0 +1,28 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+  FILE_NAME: ParseDirContext.exe
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+
+  build:
+    aliases:
+      - b
+    desc: "Build app"
+    cmds:
+      - go build
+
+  build-custom:
+    aliases:
+      - bc
+    desc: "Build app"
+    cmds:
+      - go build -o {{.FILE_NAME}}
+
