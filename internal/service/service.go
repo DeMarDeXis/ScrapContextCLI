@@ -23,9 +23,18 @@ type Service struct {
 	Parser
 }
 
-func NewService(log *slog.Logger) *Service {
+func NewService(log *slog.Logger, excludePatterns []string) *Service {
+	patterns := excludePatterns
+	if len(patterns) == 0 { // Another say "default"
+		patterns = []string{
+			".git/**", "node_modules/**", "vendor/**",
+			"export/**", "dist/**", "build/**",
+			"*.log", "*.sum", "*.exe", "*.dll", "*.so",
+		}
+	}
+
 	return &Service{
 		Config: config.NewConfService(),
-		Parser: parser.NewParserService(log),
+		Parser: parser.NewParserService(log, patterns),
 	}
 }

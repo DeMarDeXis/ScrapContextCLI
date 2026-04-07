@@ -17,12 +17,14 @@ const (
 )
 
 type ParserService struct {
-	log *slog.Logger
+	log    *slog.Logger
+	filter *Filter
 }
 
-func NewParserService(log *slog.Logger) *ParserService {
+func NewParserService(log *slog.Logger, excludePatterns []string) *ParserService {
 	return &ParserService{
-		log: log,
+		log:    log,
+		filter: NewFilter(excludePatterns),
 	}
 }
 
@@ -61,14 +63,15 @@ func (ps *ParserService) Parse(rootDir, outputPath string) error {
 			return nil
 		}
 
-		if d.IsDir() {
-			if shouldSkipDir(relPath) {
+		// Add new filter
+		if ps.filter.ShouldSkip(relPath, d.IsDir()) {
+			if d.IsDir() {
 				return fs.SkipDir
 			}
 			return nil
 		}
 
-		if shouldSkipFile(relPath) {
+		if d.IsDir() {
 			return nil
 		}
 

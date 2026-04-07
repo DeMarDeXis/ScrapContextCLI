@@ -26,7 +26,15 @@ var rootCmd = &cobra.Command{
 func Execute(logg *slog.Logger, cfg *config.Config) {
 	ctx.log = logg
 	ctx.config = cfg
-	ctx.srvc = service.NewService(logg)
+
+	var excludePatterns []string
+	if cfg != nil {
+		excludePatterns = cfg.Exclude
+	}
+
+	ctx.log.Debug("init service", slog.Any("exclude", excludePatterns))
+
+	ctx.srvc = service.NewService(logg, excludePatterns)
 
 	if err := rootCmd.Execute(); err != nil {
 		handleErr(logg, err)

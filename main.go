@@ -24,8 +24,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Если конфиг не загружен — просто логируем, но не падаем
-	// (команда parse сама проверит и выдаст подсказку)
+	// If config is not loaded — just log it, but don't panic
+	// (cmd parse can check config and give hint)
 	if cfg == nil {
 		logg.Debug("config not found — some commands may require it")
 	} else {
@@ -51,7 +51,5 @@ func setupPrettySlogLocal() *slog.Logger {
 }
 
 // TODO:
-// 		service.parser.filter.go should take the values from config.yaml [main]
-//		delete legacy code service.config.craftConfig.go
-//		maybe consts should be used in func [writeFileContent]
+//		maybe consts should be used in func [writeFileContent] as string builder
 // 		legacy code in pkg/config/config.go

@@ -87,8 +87,9 @@ func SaveConfig(cfg *Config) error {
 	//}
 
 	if err := viper.SafeWriteConfig(); err != nil {
-		// Если файл уже есть — используем WriteConfig (перезапись)
+		// If file already exists — use WriteConfig (rewrite)
 		// Проверяем по тексту ошибки, т.к. os.IsExist не срабатывает с viper
+		// Check errores by text, porque os.IsExist dont work with viper
 		if strings.Contains(err.Error(), "Already Exists") {
 			return viper.WriteConfig()
 		}

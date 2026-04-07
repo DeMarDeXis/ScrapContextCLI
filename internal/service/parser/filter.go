@@ -1,33 +1,31 @@
 package parser
 
-import "strings"
+import (
+	gitIgnorePKG "github.com/sabhiram/go-gitignore"
+)
 
-// shouldSkipDir — dir which we should skip
-func shouldSkipDir(relPath string) bool {
-	skip := []string{
-		".git", "node_modules", "vendor",
-		"export", "dist", "build",
-	}
-	for _, s := range skip {
-		if relPath == s || strings.HasPrefix(relPath, s+"/") {
-			return true
-		}
-	}
-	return false
+type Filter struct {
+	ignorer gitIgnorePKG.IgnoreParser
 }
 
-// shouldSkipFile — file which we should skip
-func shouldSkipFile(relPath string) bool {
-	skipExts := []string{
-		".exe", ".dll", ".so", ".dylib",
-		".png", ".jpg", ".jpeg", ".gif",
-		".zip", ".tar", ".gz", ".pdf",
-		".log", ".sum",
+// NewFilter compiles patterns to matcher
+func NewFilter(patterns []string) *Filter {
+	return &Filter{
+		ignorer: gitIgnorePKG.CompileIgnoreLines(patterns...),
 	}
-	for _, ext := range skipExts {
-		if strings.HasSuffix(relPath, ext) {
-			return true
-		}
+}
+
+// ShouldSkip checks if the path should be skipped
+func (f *Filter) ShouldSkip(relPath string, isDir bool) bool {
+	// Normalize: gitignore expects paths without "./" and with forward slashes
+	normalized := relPath
+	if len(normalized) > 2 && normalized[:2] == "./" {
+		normalized = normalized[2:]
 	}
-	return false
+
+	if isDir && len(normalized) > 0 && normalized[len(normalized)-1] != '/' {
+		normalized += "/"
+	}
+
+	return f.ignorer.MatchesPath(normalized)
 }
